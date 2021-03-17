@@ -355,14 +355,11 @@ void printAccelValues(void* displayData) {
     accelerometerData* accelValues = (accelerometerData*) data->accelData;
     
     if ( *(accelValues->displayAccelFlag) ) {
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->x, 0, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->y, 1, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->z, 2, 'cm');
+        printAccelValues_Helper(data->tftDisplay, accelValues->xRelPosition, 0, 'cm');
+        printAccelValues_Helper(data->tftDisplay, accelValues->yRelPosition, 1, 'cm');
+        printAccelValues_Helper(data->tftDisplay, accelValues->zRelPosition, 2, 'cm');
         printAccelValues_Helper(data->tftDisplay, accelValues->totalDistance, 3, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->x, 4, 'deg');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->y, 5, 'deg');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->z, 6, 'deg');
-
+        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle, 4, 'deg');
         *(accelValues->displayAccelFlag) = LOW;
     }
 }
