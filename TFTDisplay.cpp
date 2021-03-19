@@ -385,7 +385,7 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line) 
     // Buffer to hold the message that will be printed to the screen
     char cBuffer[10] = "";
     
-    tftDisplay->fillRect(LABEL_VALUE_X, (LABEL_Y + (line * LABEL_Y_SPACE) ), 115, 15, BLACK);
+    tftDisplay->fillRect(LABEL_VALUE_X, (LABEL_Y + (line * 20) ), 115, 15, BLACK);
     tftDisplay->setCursor(LABEL_VALUE_X, (LABEL_Y + (line * 20) ));
     
     dtostrf(*value, 4, 1, cBuffer);
