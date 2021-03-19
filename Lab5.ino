@@ -143,12 +143,20 @@ volatile bool screenLocked = LOW;
 
 // Accelerometer data
 accelerometerData  accelData;
-float xRelativePosition;
-float yRelativePosition;
-float zRelativePosition;
-float totalDistance;
-float staticAngle;
+int accelPins[3] = {A10, A11, A12};
 
+float staticAngle[3] = {0, 0, 0};
+float position[3] = {0, 0, 0};
+float velocity[3] = {0, 0, 0};
+float avgVelocity[3] = {0, 0, 0};
+float instAccel[3] = {0, 0, 1};
+float avgAccel[3] = {0, 0, 0};
+
+// Subtract these values from respective accelerometer readings to give acceleration
+// with respect to gravity
+float CAL_OFFSET[3] =  {0.03, 0.27, -0.29};
+
+float totalDistance = 0;
 
 // TouchScreen initialization
 tftDisplayTaskData dData;
@@ -193,12 +201,6 @@ char accelLabels[5][10] = {
   "StatAngle:" 
 };
 
-//Pointers to data structs for contactor ISR
-struct contactorTaskData* data =  &cData;
-struct alarmTaskData* adata = &aData;
-struct measurementTaskData* mdata = &mData;
-struct socTaskData* s_data = &s_Data;
-
 
 void setup() {
   /****************
@@ -235,6 +237,10 @@ void setup() {
     pinMode(HV_VOLT_PIN, INPUT_PULLUP);
     pinMode(TEMP_PIN, INPUT_PULLUP);
 
+    // Accelerometor pins
+    pinMode(accelPins[0], INPUT);
+    pinMode(accelPins[1], INPUT);
+    pinMode(accelPins[2], INPUT);
 
     // Initialize Data Log
     lData                     = {&writeTempMin, &writeTempMax, &tempMin, &tempMax, &writeCurrMin,
@@ -322,8 +328,8 @@ void setup() {
 
 
     // Initialize accelerometer data
-    accelData               = {&xRelativePosition, &yRelativePosition, &zRelativePosition, &totalDistance,
-                              &staticAngle, &displayAccelFlag};
+    accelData               = {&staticAngle, &position, &velocity, &avgVelocity, &instAccel, &avgAccel,
+                               &totalDistance, &displayAccelFlag, &accelPins, &CAL_OFFSET};
     accelerometerTCB.task   = &accelerometerTask;
     accelerometerTCB.taskDataPtr = &accelData;
     accelerometerTCB.next   = NULL;
@@ -359,7 +365,6 @@ void loop() {
         if( timeBaseFlag == HIGH) {
             timeBaseFlag = LOW;
             schedulerTask(&sData);
-
         }
     }
 }
