@@ -177,8 +177,8 @@ void printLabels(void* displayData) {
         data->tftDisplay->setCursor( LABEL_X, BATT_STATUS_Y);
         data->tftDisplay->println("Battery is:");
     } else if( *(data->nState) == accelScreen) {
-        for (int i = 0; i<5; i++) {
-            data->tftDisplay->setCursor( LABEL_X, (LABEL_Y + (i * LABEL_Y_SPACE)));
+        for (int i = 0; i<7; i++) {
+            data->tftDisplay->setCursor( LABEL_X, (LABEL_Y + (i * 20)));
             data->tftDisplay->print( (char[10]) data ->accelLabels + i*10);
         }
     }
@@ -350,25 +350,25 @@ void printAccelValues(void* displayData) {
     * Function description: Prints accelerometer values to screen
     * Author(s): Sophia Kim
     *****************/
-    /*
+    
     tftDisplayData* data = (tftDisplayData*) displayData;
     accelerometerData* accelValues = (accelerometerData*) data->accelData;
     
     if ( *(accelValues->displayAccelFlag) ) {
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->x, 0, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->y, 1, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->z, 2, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->totalDistance, 3, 'cm');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->x, 4, 'deg');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->y, 5, 'deg');
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->z, 6, 'deg');
+        printAccelValues_Helper(data->tftDisplay, accelValues->position->x, 0);
+        printAccelValues_Helper(data->tftDisplay, accelValues->position->y, 1);
+        printAccelValues_Helper(data->tftDisplay, accelValues->position->z, 2);
+        printAccelValues_Helper(data->tftDisplay, accelValues->totalDistance, 3);
+        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->x, 4);
+        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->y, 5);
+        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->z, 6);
 
         *(accelValues->displayAccelFlag) = LOW;
-    }*/
+    }
 }
 
 
-void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, char units) {
+void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line) {
     /****************
     * Function name: printAccelValues_Helper()
     * Function inputs: Elegoo_TFTLCD* tftDisplay references the object that is used to
@@ -381,17 +381,17 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, 
     * Function description: Prints accelerometer values to screen
     * Author(s): Sophia Kim
     *****************/
-    /*
+    
     // Buffer to hold the message that will be printed to the screen
     char cBuffer[10] = "";
     
     tftDisplay->fillRect(LABEL_VALUE_X, (LABEL_Y + (line * LABEL_Y_SPACE) ), 115, 15, BLACK);
-    tftDisplay->setCursor(LABEL_VALUE_X, (LABEL_Y + (line * LABEL_Y_SPACE) ));
+    tftDisplay->setCursor(LABEL_VALUE_X, (LABEL_Y + (line * 20) ));
     
     dtostrf(*value, 4, 1, cBuffer);
     char leftStr[10] = "   ";
     int padLen = 0;
-    char rightStr[3] = {' ', units, '\0'};
+    char rightStr[3] = {' ' '\0'};
 
     if (*value >= 0.) {
         padLen++;
@@ -404,7 +404,7 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, 
     leftStr[padLen] = "\0";
     strcat(leftStr, cBuffer);
     strcat(leftStr, rightStr);
-    tftDisplay->print(leftStr);*/
+    tftDisplay->print(leftStr);
 }
 
 
