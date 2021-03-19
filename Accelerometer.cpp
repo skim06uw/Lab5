@@ -9,7 +9,7 @@ void updateAccel(float* a1, float* avgAccel, int* accelPins, float* CAL_OFFSET) 
     float a0[3];
     for (int i=0; i<3; i++) {
         a0[i] = *(a1+i);
-        *(a1+i) = map(analogRead( *(accelPins+i) ), 92, 584, -246, 245) * (1.5 / 245) - *(CAL_OFFSET+i);
+        *(a1+i) = map(analogRead( *(accelPins+i) ), 92, 584, -246, 245) * (1.5 / 246) - *(CAL_OFFSET+i);
         *(avgAccel+i) = ( a0[i] + *(a1+i) ) / 2;
         /*
         Serial.print("Accleration for: ");
@@ -25,13 +25,13 @@ void updateVelocity(float* v1, float* a, float* avgVelocity) {
 
     for (int i=0; i<3; i++) {
         v0[i] = *(v1+i);
-        *(v1+i) += *(a+i) * 980.665 * DELTA_T; // a * 980.665 converts acceleration to  [cm/s^2]
-        *(avgVelocity+i) = ( v0[i] + *(v1+i) ) / 2;
+        *(v1+i) += *(a+i) * 980.665 * (GLOBAL_TIME_STEP / 1000.0); // a * 980.665 converts acceleration to  [cm/s^2]
+        *(avgVelocity+i) = ( v0[i] + *(v1+i) ) / 2;/*
         Serial.print("Velocity for: ");
         Serial.println(i);
         Serial.println( *(avgVelocity+i) );
     }
-    Serial.println();
+    Serial.println();*/}
 }
 
 void updateDisplacement(float* p1, float* v, float* totalDistance) {
@@ -39,16 +39,28 @@ void updateDisplacement(float* p1, float* v, float* totalDistance) {
     double radicand = 0;
     for (int i=0; i<3; i++) {
         p0[i] = *(p1+i);
-        *(p1+i) += *(v+i) * DELTA_T;
+        *(p1+i) += *(v+i) * (GLOBAL_TIME_STEP / 1000.0);
         radicand += pow( (double) (*(p1+i) - p0[i]), 2);
+        Serial.print("Position for ");
+        Serial.print( (char)(i+88) );
+        Serial.print(": ");
+        Serial.println( *(p1+i) );
     }
     *totalDistance += (float) sqrt(radicand); 
+    Serial.print("Total Distance: ");
+    Serial.println( *totalDistance );
+    Serial.println();
 }
 
 void updateAngles(float* staticAngle, float* a) {
     for (int i=0; i<3; i++) {
         *(staticAngle+i) = acos( *(a+i) ) * (180 / PI);
-        
+        if ( *(staticAngle+i) == NULL) {
+            *(staticAngle+i) = 0;
+        }
+        if ( *(a+i) < 0) {
+            *(staticAngle+i) = 180 - *(staticAngle+i);
+        }
         Serial.print("Angle for: ");
         Serial.println(i);
         Serial.println( *(staticAngle+i) );
@@ -59,7 +71,7 @@ void updateAngles(float* staticAngle, float* a) {
 bool accelChanged(float prevAccel[3], float* currAccel) {
     bool changed = false;
     for (int i=0; i<3; i++) {
-        if (abs(prevAccel[i] - *(currAccel+i)) > 0.04) {
+        if (abs(prevAccel[i] - *(currAccel+i)) > 0.02) {
             changed = true;
         }
     }

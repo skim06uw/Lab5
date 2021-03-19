@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include "Scheduler.h"
 #include "TaskControlBlock.h"
-
+#include "Accelerometer.h"
 
 void insert_node( TCB* node ) {
     (node->next)->prev = node; 
@@ -26,11 +26,13 @@ void schedulerTask(void* sData) {
     schedulerData* data = (schedulerData*) sData;
 
     TCB* current = ((schedulerData*) sData)->head;
-    
-    if ( *(data->taskCounter) % 10 == 0 ) {
-        insert_node( data->remoteTermTCB );
-        if ( *(data->taskCounter) % 50 == 0 ) {
-            insert_node( data->dataLogTCB );
+    if ( *(data->taskCounter) % 100 / GLOBAL_TIME_STEP ) {
+        insert_node(data->measurementTCB);
+        if ( *(data->taskCounter) % 1000 / GLOBAL_TIME_STEP ) {
+            insert_node( data->remoteTermTCB );
+            if ( *(data->taskCounter) % ( 5000 / GLOBAL_TIME_STEP ) == 0 ) {
+                insert_node( data->dataLogTCB );
+            }
         }
     }
     
@@ -41,13 +43,15 @@ void schedulerTask(void* sData) {
         }
         current = current->next;
     }
-
-        //remove tasks that run at 1 Hz
-    if( *(data->taskCounter) % 10 == 0 ) {
-        delete_node( data->remoteTermTCB );
-        //remove tasks that run at .2 Hz
-        if( *(data->taskCounter) % 50 == 0 ) {
-            delete_node( data->dataLogTCB );
+    if ( *(data->taskCounter) % 100 / GLOBAL_TIME_STEP ) {
+        ( ((schedulerData*) sData)->head )->next = NULL;
+        if( *(data->taskCounter) % 1000 / GLOBAL_TIME_STEP ) {
+            //remove tasks that run at 1 Hz
+            delete_node( data->remoteTermTCB );
+            if( *(data->taskCounter) % 5000 / GLOBAL_TIME_STEP ) {
+                //remove tasks that run at .2 Hz
+                delete_node( data->dataLogTCB );
+            }
         }
     }
 

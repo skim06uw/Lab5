@@ -12,6 +12,7 @@ extern "C" {
 // Define a data structure for the alarm task
 typedef struct schedulerTaskData {
   TCB* head;
+  TCB* measurementTCB;
   TCB* remoteTermTCB;
   TCB* dataLogTCB;
   int* taskCounter;

@@ -6,7 +6,8 @@
 #include <Arduino.h>
 #include "Accelerometer.h"
 
-#define DELTA_T 0.001
+
+#define GLOBAL_TIME_STEP 10
 /*
 #define X_PIN A10
 #define Y_PIN A11
