@@ -11,7 +11,9 @@ typedef struct accelerometerTaskData {
     float* yRelPosition;
     float* zRelPosition;
     float* totalDistance;
-    float* staticAngle;
+    float* xstaticAngle;
+    float* ystaticAngle;
+    float* zstaticAngle;
     bool* displayAccelFlag;
 } accelerometerData;
 

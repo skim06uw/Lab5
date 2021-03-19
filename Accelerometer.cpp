@@ -10,7 +10,9 @@ void accelerometerTask(void* accelData) {
     *(data->yRelPosition) = 0;
     *(data->zRelPosition) = 0;
     *(data->totalDistance) = 0;
-    *(data->staticAngle) = 0;
+    *(data->xstaticAngle) = 0;
+    *(data->ystaticAngle) = 0;
+    *(data->ystaticAngle) = 0;
 
 
 }

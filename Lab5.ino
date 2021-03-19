@@ -147,7 +147,9 @@ float xRelativePosition;
 float yRelativePosition;
 float zRelativePosition;
 float totalDistance;
-float staticAngle;
+float xstaticAngle;
+float ystaticAngle;
+float zstaticAngle;
 
 
 // TouchScreen initialization
@@ -185,12 +187,14 @@ char aLabels[3][10] = {
 };
 
 // Labels for accelerometer screen
-char accelLabels[5][10] = {
-  "RelPos x:",
-  "RelPos y:",
-  "RelPos z:",
+char accelLabels[7][10] = {
+  "Pos x cm:",
+  "Pos y cm:",
+  "Pos z cm:",
   "TotDist:",
-  "StatAngle:" 
+  "x deg:", 
+  "y deg:", 
+  "z deg:" 
 };
 
 //Pointers to data structs for contactor ISR
@@ -323,7 +327,7 @@ void setup() {
 
     // Initialize accelerometer data
     accelData               = {&xRelativePosition, &yRelativePosition, &zRelativePosition, &totalDistance,
-                              &staticAngle, &displayAccelFlag};
+                              &xstaticAngle, &ystaticAngle, &zstaticAngle, &displayAccelFlag};
     accelerometerTCB.task   = &accelerometerTask;
     accelerometerTCB.taskDataPtr = &accelData;
     accelerometerTCB.next   = NULL;
