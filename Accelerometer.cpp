@@ -4,55 +4,92 @@
 #include <Math.h>
 #include "Accelerometer.h"
 
-float avgAccel(float* a, int pin) {
-    float a_0 = *a;
-    
-    int aRaw = analogRead(pin);
-    *a = map(aRaw, 0, 582, -1500, 1500) / 1000.0;
-    Serial.print("Raw acceleration: ");
-    Serial.println(aRaw);
-    return (*a + a_0) / 2;
+
+void updateAccel(float* a1, float* avgAccel, int* accelPins, float* CAL_OFFSET) {
+    float a0[3];
+    for (int i=0; i<3; i++) {
+        a0[i] = *(a1+i);
+        *(a1+i) = map(analogRead( *(accelPins+i) ), 92, 584, -246, 245) * (1.5 / 245) - *(CAL_OFFSET+i);
+        *(avgAccel+i) = ( a0[i] + *(a1+i) ) / 2;
+        /*
+        Serial.print("Accleration for: ");
+        Serial.println(i);
+        Serial.println( *(avgAccel+i) );
+    }
+    Serial.println();*/}
+    *(avgAccel+2) -= 1;
 }
 
-float avgVelocity(float* v, float* a) {
-    float v_0 = *v;
-    *v = (*a) * DELTA_T;
-    return (*v + v_0) / 2;
+void updateVelocity(float* v1, float* a, float* avgVelocity) {
+    float v0[3];
+
+    for (int i=0; i<3; i++) {
+        v0[i] = *(v1+i);
+        *(v1+i) += *(a+i) * 980.665 * DELTA_T; // a * 980.665 converts acceleration to  [cm/s^2]
+        *(avgVelocity+i) = ( v0[i] + *(v1+i) ) / 2;
+        Serial.print("Velocity for: ");
+        Serial.println(i);
+        Serial.println( *(avgVelocity+i) );
+    }
+    Serial.println();
 }
 
-float displacement(float* position, float vBar) {
-    float p_0 = *position;
-    *position += vBar * DELTA_T;
-    return *position - p_0;
+void updateDisplacement(float* p1, float* v, float* totalDistance) {
+    float p0[3];
+    double radicand = 0;
+    for (int i=0; i<3; i++) {
+        p0[i] = *(p1+i);
+        *(p1+i) += *(v+i) * DELTA_T;
+        radicand += pow( (double) (*(p1+i) - p0[i]), 2);
+    }
+    *totalDistance += (float) sqrt(radicand); 
+}
+
+void updateAngles(float* staticAngle, float* a) {
+    for (int i=0; i<3; i++) {
+        *(staticAngle+i) = acos( *(a+i) ) * (180 / PI);
+        if ( *(staticAngle+i) == NULL) {
+            *(staticAngle+i) = 0;
+        }
+        
+        Serial.print("Angle for: ");
+        Serial.println(i);
+        Serial.println( *(staticAngle+i) );
+        
+    }
+}
+
+bool accelChanged(float prevAccel[3], float* currAccel) {
+    bool changed = false;
+    for (int i=0; i<3; i++) {
+        if (abs(prevAccel[i] - *(currAccel+i)) > 0.04) {
+            changed = true;
+        }
+    }
+    return changed;
 }
 
 void accelerometerTask(void* accelData) {
-    accelerometerData* data = (accelerometerData*) accelData;
+    accelerometerData* data = (accelerometerData*) accelData; 
 
-    // Update static angles
-    *(data->staticAngle->x) = acos( *(data->acceleration->x) ) * (180 / PI);
-    *(data->staticAngle->y) = acos( *(data->acceleration->y) ) * (180 / PI);
-    *(data->staticAngle->z) = acos( *(data->acceleration->z) ) * (180 / PI);
-
-
+    float prevAccel[3];
+    for (int i=0; i<3; i++) {
+        prevAccel[i] = *( ((float*) data->instAccel)+i );
+    }
     // Find average acceleration over time step and update
     // acceleration reading for all dimensions
-    float a_xBar = avgAccel(data->acceleration->x, X_PIN);
-    float a_yBar = avgAccel(data->acceleration->y, Y_PIN);
-    float a_zBar = avgAccel(data->acceleration->z, Z_PIN) - 1;
+    updateAccel( (float*)data->instAccel, (float*)data->avgAccel, (int*)data->accelPins,
+                 (float*)data->CAL_OFFSET );
 
-    // Find average velocity over time step and update velocity
-    // for all dimensions
-    float v_xBar = avgVelocity(data->velocity->x, data->acceleration->x);
-    float v_yBar = avgVelocity(data->velocity->y, data->acceleration->y);
-    float v_zBar = avgVelocity(data->velocity->z, data->acceleration->z);
-
+    if( accelChanged(prevAccel, (float*)data->instAccel) ) {
+        // Update static angles
+        updateAngles( (float*)data->staticAngle, (float*)data->instAccel);
+        
+        // Find average velocity over time step and update velocity
+        updateVelocity( (float*)data->velocity, (float*)data->avgAccel, (float*)data->avgVelocity);
+    }
 
     // Update position and find displacement for all dimensions
-    float r_x = displacement(data->position->x, v_xBar);
-    float r_y = displacement(data->position->y, v_yBar);
-    float r_z = displacement(data->position->z, v_zBar);
-    
-    *(data->totalDistance) += (float) sqrt( pow(r_x, 2) + pow(r_y, 2) + pow(r_z, 2) );
-    Serial.println(*(data->acceleration->z));
+    updateDisplacement( (float*)data->position, (float*)data->avgVelocity, data->totalDistance);
+
 }

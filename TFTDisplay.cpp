@@ -350,7 +350,7 @@ void printAccelValues(void* displayData) {
     * Function description: Prints accelerometer values to screen
     * Author(s): Sophia Kim
     *****************/
-    
+    /*
     tftDisplayData* data = (tftDisplayData*) displayData;
     accelerometerData* accelValues = (accelerometerData*) data->accelData;
     
@@ -364,7 +364,7 @@ void printAccelValues(void* displayData) {
         printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->z, 6, 'deg');
 
         *(accelValues->displayAccelFlag) = LOW;
-    }
+    }*/
 }
 
 
@@ -381,7 +381,7 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, 
     * Function description: Prints accelerometer values to screen
     * Author(s): Sophia Kim
     *****************/
-    
+    /*
     // Buffer to hold the message that will be printed to the screen
     char cBuffer[10] = "";
     
@@ -404,7 +404,7 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, 
     leftStr[padLen] = "\0";
     strcat(leftStr, cBuffer);
     strcat(leftStr, rightStr);
-    tftDisplay->print(leftStr);
+    tftDisplay->print(leftStr);*/
 }
 
 
