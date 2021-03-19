@@ -193,12 +193,14 @@ char aLabels[3][10] = {
 };
 
 // Labels for accelerometer screen
-char accelLabels[5][10] = {
-  "RelPos x:",
-  "RelPos y:",
-  "RelPos z:",
+char accelLabels[7][10] = {
+  "Pos x cm:",
+  "Pos y cm:",
+  "Pos z cm:",
   "TotDist:",
-  "StatAngle:" 
+  "x deg:",
+  "y deg:",
+  "z deg:"
 };
 
 
