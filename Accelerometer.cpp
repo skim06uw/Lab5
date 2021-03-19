@@ -40,38 +40,39 @@ void updateDisplacement(float* p1, float* v, float* totalDistance) {
     for (int i=0; i<3; i++) {
         p0[i] = *(p1+i);
         *(p1+i) += *(v+i) * (GLOBAL_TIME_STEP / 1000.0);
-        radicand += pow( (double) (*(p1+i) - p0[i]), 2);
         Serial.print("Position for ");
         Serial.print( (char)(i+88) );
         Serial.print(": ");
         Serial.println( *(p1+i) );
     }
-    *totalDistance += (float) sqrt(radicand); 
+    *totalDistance += (float) sqrt(pow( (double) (*(p1+0) - p0[0]), 2) + pow( (double) (*(p1+1) - p0[1]), 2));/*
     Serial.print("Total Distance: ");
     Serial.println( *totalDistance );
-    Serial.println();
+    Serial.println();*/
 }
 
 void updateAngles(float* staticAngle, float* a) {
     for (int i=0; i<3; i++) {
-        *(staticAngle+i) = acos( *(a+i) ) * (180 / PI);
-        if ( *(staticAngle+i) == NULL) {
+        if ( abs( *(a+i) ) >= 1) {
             *(staticAngle+i) = 0;
+        } else {
+            *(staticAngle+i) = acos( *(a+i) ) * (180 / PI);
         }
+
         if ( *(a+i) < 0) {
             *(staticAngle+i) = 180 - *(staticAngle+i);
-        }
+        }/*
         Serial.print("Angle for: ");
-        Serial.println(i);
-        Serial.println( *(staticAngle+i) );
-        
+        Serial.print( (char)(i+88) );
+        Serial.print(": ");
+        Serial.println( *(staticAngle+i) );*/
     }
 }
 
 bool accelChanged(float prevAccel[3], float* currAccel) {
     bool changed = false;
     for (int i=0; i<3; i++) {
-        if (abs(prevAccel[i] - *(currAccel+i)) > 0.02) {
+        if (abs(prevAccel[i] - *(currAccel+i)) > 0.01) {
             changed = true;
         }
     }
@@ -91,6 +92,7 @@ void accelerometerTask(void* accelData) {
                  (float*)data->CAL_OFFSET );
 
     if( accelChanged(prevAccel, (float*)data->instAccel) ) {
+        *data->displayAccelFlag = HIGH;
         // Update static angles
         updateAngles( (float*)data->staticAngle, (float*)data->instAccel);
         

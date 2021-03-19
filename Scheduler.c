@@ -26,9 +26,9 @@ void schedulerTask(void* sData) {
     schedulerData* data = (schedulerData*) sData;
 
     TCB* current = ((schedulerData*) sData)->head;
-    if ( *(data->taskCounter) % 100 / GLOBAL_TIME_STEP ) {
+    if ( *(data->taskCounter) % (100 / GLOBAL_TIME_STEP) == 0 ) {
         insert_node(data->measurementTCB);
-        if ( *(data->taskCounter) % 1000 / GLOBAL_TIME_STEP ) {
+        if ( *(data->taskCounter) % (1000 / GLOBAL_TIME_STEP) == 0 ) {
             insert_node( data->remoteTermTCB );
             if ( *(data->taskCounter) % ( 5000 / GLOBAL_TIME_STEP ) == 0 ) {
                 insert_node( data->dataLogTCB );
@@ -43,12 +43,12 @@ void schedulerTask(void* sData) {
         }
         current = current->next;
     }
-    if ( *(data->taskCounter) % 100 / GLOBAL_TIME_STEP ) {
+    if ( *(data->taskCounter) % (100 / GLOBAL_TIME_STEP) == 0 ) {
         ( ((schedulerData*) sData)->head )->next = NULL;
-        if( *(data->taskCounter) % 1000 / GLOBAL_TIME_STEP ) {
+        if( *(data->taskCounter) % (1000 / GLOBAL_TIME_STEP) == 0 ) {
             //remove tasks that run at 1 Hz
             delete_node( data->remoteTermTCB );
-            if( *(data->taskCounter) % 5000 / GLOBAL_TIME_STEP ) {
+            if( *(data->taskCounter) % (5000 / GLOBAL_TIME_STEP) == 0 ) {
                 //remove tasks that run at .2 Hz
                 delete_node( data->dataLogTCB );
             }

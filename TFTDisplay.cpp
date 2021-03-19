@@ -197,8 +197,6 @@ void printMeasurementValues(void* displayData) {
     tftDisplayData* data = (tftDisplayData*) displayData;
     measurementData* mValues = (measurementData*) data->mData;
 
-    // Erase the measurement values from the screen
-    //data->tftDisplay->fillRect(LABEL_VALUE_X, LABEL_Y, (240 - LABEL_VALUE_X), (5 * LABEL_Y_SPACE), BLACK);
     data->tftDisplay->setTextColor(LABEL_VALUE_COLOR);
     data->tftDisplay->setTextSize(LABEL_TSIZE);
 
@@ -355,14 +353,13 @@ void printAccelValues(void* displayData) {
     accelerometerData* accelValues = (accelerometerData*) data->accelData;
     
     if ( *(accelValues->displayAccelFlag) ) {
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->x, 0);
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->y, 1);
-        printAccelValues_Helper(data->tftDisplay, accelValues->position->z, 2);
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->position+0, 0);
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->position+1, 1);
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->position+2, 2);
         printAccelValues_Helper(data->tftDisplay, accelValues->totalDistance, 3);
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->x, 4);
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->y, 5);
-        printAccelValues_Helper(data->tftDisplay, accelValues->staticAngle->z, 6);
-
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->staticAngle+0, 4);
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->staticAngle+1, 5);
+        printAccelValues_Helper(data->tftDisplay, (float*)accelValues->staticAngle+2, 6);
         *(accelValues->displayAccelFlag) = LOW;
     }
 }
@@ -376,22 +373,23 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line) 
     *                  float* is the value to be printed
     *                  int x and int y are the coordinates where the message needs
     *                  to be printed
-    *                  units is the value's units
     * Function outputs: none
     * Function description: Prints accelerometer values to screen
     * Author(s): Sophia Kim
     *****************/
     
     // Buffer to hold the message that will be printed to the screen
-    char cBuffer[10] = "";
+    char cBuffer[7] = "";
     
     tftDisplay->fillRect(LABEL_VALUE_X, (LABEL_Y + (line * 20) ), 115, 15, BLACK);
     tftDisplay->setCursor(LABEL_VALUE_X, (LABEL_Y + (line * 20) ));
-    
+    tftDisplay->setTextColor(CYAN);
+    /*
     dtostrf(*value, 4, 1, cBuffer);
     char leftStr[10] = "   ";
     int padLen = 0;
-    char rightStr[3] = {' ' '\0'};
+    //char rightStr[3] = {' ', units, '\0'};
+    char rightStr[2] = {' ', '\0'};
 
     if (*value >= 0.) {
         padLen++;
@@ -401,10 +399,10 @@ void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line) 
         padLen++;
     }
     
-    leftStr[padLen] = "\0";
+    leftStr[padLen] = '\0';
     strcat(leftStr, cBuffer);
-    strcat(leftStr, rightStr);
-    tftDisplay->print(leftStr);
+    strcat(leftStr, rightStr);*/
+    tftDisplay->print(dtostrf(*value, 4, 1, cBuffer));
 }
 
 
