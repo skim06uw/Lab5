@@ -117,7 +117,7 @@ void updateValues(void* displayData);
 void tftDisplayTask (void*);
 void updateAlarmButtons(void* displayData);
 void printAccelValues(void* displayData);
-void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line, char units);
+void printAccelValues_Helper(Elegoo_TFTLCD* tftDisplay, float* value, int line);
 
 void ISR_New_Alarm();
 
